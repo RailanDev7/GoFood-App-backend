@@ -1,0 +1,152 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+//model user
+model User {
+  id                 Int                   @id @default(autoincrement())
+  nome               String
+  email              String                @unique
+  telefone           String                @unique
+
+  verify_codes       Verify_code[]
+  profiles           Profile[]
+  email_checkeds     Email_checked[]
+  product_sold_user  Product_Sold_User[]
+  orders             Order[]
+
+  createdAt          DateTime              @default(now())
+}
+//check code phone
+model Verify_code {
+  id           Int      @id @default(autoincrement())
+  userId       Int
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  code         String
+  checked_code Boolean  @default(false)
+
+  createdAt    DateTime @default(now())
+  expiresAt    DateTime
+}
+//check code email
+model Email_checked {
+  id         Int      @id @default(autoincrement())
+  code       String
+  checked    Boolean  @default(false)
+
+  userId     Int
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+}
+
+//profile
+model Profile {
+  id         Int      @id @default(autoincrement())
+  nome       String
+  photo_url  String
+  bio        String
+
+  userId     Int
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt  DateTime @default(now())
+}
+//
+enum OrderStatus {
+  PENDING
+  ACCEPTED
+  PREPARING
+  OUT_FOR_DELIVERY
+  DELIVERED
+  CANCELLED
+}
+
+
+model Order {
+  id         Int           @id @default(autoincrement())
+
+  userId     Int
+  user       User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  total      Decimal       @db.Decimal(10,2)
+  status     OrderStatus   @default(PENDING)
+
+  payments   Payment[]     // 1 pedido pode ter vários pagamentos (tentativas)
+
+  createdAt  DateTime      @default(now())
+}
+
+//sales history products
+model Product_Sold_User {
+  id              Int               @id @default(autoincrement())
+
+  userId          Int
+  user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  product_name    String
+  price_product   Decimal           @db.Decimal(10,2)
+  description     String?
+  total           Decimal           @db.Decimal(10,2)
+
+  payment_history Payment_History[]
+
+  createdAt       DateTime          @default(now())
+}
+
+
+//history payment
+model Payment_History {
+  id               Int                 @id @default(autoincrement())
+
+  products_Id      Int
+  product_sold_user Product_Sold_User  @relation(fields: [products_Id], references: [id], onDelete: Cascade)
+
+  total            Decimal             @db.Decimal(10,2)
+
+  createdAt        DateTime            @default(now())
+}
+
+//payment methods
+enum PaymentMethod {
+  PIX
+  CREDIT_CARD
+  DEBIT_CARD
+}
+
+enum PaymentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  REFUNDED
+  CANCELLED
+}
+
+model Payment {
+  id            Int            @id @default(autoincrement())
+
+  orderId       Int
+  order         Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  amount        Decimal        @db.Decimal(10,2)
+  method        PaymentMethod
+  status        PaymentStatus  @default(PENDING)
+
+  transactionId String?
+  gateway       String?
+
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+}
+
+//carrosel img
+model Carrosel_Img {
+  id            Int    @id @default(autoincrement())
+  url_carrosel  String
+}
