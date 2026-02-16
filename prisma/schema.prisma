@@ -18,6 +18,7 @@ model User {
   email_checkeds     Email_checked[]
   product_sold_user  Product_Sold_User[]
   orders             Order[]
+  user_address       User_Address[]
 
   createdAt          DateTime              @default(now())
 }
@@ -43,6 +44,22 @@ model Email_checked {
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   expiresAt  DateTime
+  createdAt  DateTime @default(now())
+}
+
+//Address
+model User_Address {
+  id         Int      @id @default(autoincrement())
+  userId Int
+  cep String
+  rua String
+  logadouro String
+  numero Int
+  complemento String
+  bairro String
+  cidade String
+  Estado String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt  DateTime @default(now())
 }
 
