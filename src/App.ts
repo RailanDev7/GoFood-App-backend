@@ -1,6 +1,5 @@
-import express from 'express';
-import router from './api/orders/router.ts';
-
+import express from 'express'
+import router from './api/routes/router.js'
 
 const app = express();
 
