@@ -19,6 +19,7 @@ model User {
   product_sold_user  Product_Sold_User[]
   orders             Order[]
   user_address       User_Address[]
+  session            Session[]
 
   createdAt          DateTime              @default(now())
 }
@@ -45,6 +46,14 @@ model Email_checked {
 
   expiresAt  DateTime
   createdAt  DateTime @default(now())
+}
+//session
+model Session {
+  id        String   @id @default(uuid())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  expiresAt DateTime
+  createdAt DateTime @default(now())
 }
 
 //Address
