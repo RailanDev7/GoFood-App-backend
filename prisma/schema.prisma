@@ -11,7 +11,7 @@ model User {
   id                 Int                   @id @default(autoincrement())
   nome               String
   email              String                @unique
-  telefone           String                @unique
+  checked_user       Boolean               @default(false)
 
   verify_codes       Verify_code[]
   profiles           Profile[]
